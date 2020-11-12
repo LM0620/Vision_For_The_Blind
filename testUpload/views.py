@@ -3,6 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from .serializers import FileSerializer
 from rest_framework import status
+from testUpload import text as txt
+from os import path as path
 
 
 class FileView(APIView):
@@ -12,10 +14,12 @@ class FileView(APIView):
         file_serializer = FileSerializer(data=request.data)
         if file_serializer.is_valid():
             up_pic = request.FILES['file']
-            destination = open('/Users/wenruowang/Downloads/CS499/testUpload/media' + up_pic.name,'wb+')
+            new_path = path.dirname(path.abspath(__file__)) + up_pic.name
+            destination = open(new_path,'wb+')
             for chunk in up_pic.chunks():
                 destination.write(chunk)
+            output = txt.get_setence(new_path)
             destination.close()
-            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+            return Response(output, status=status.HTTP_201_CREATED)
         else:
             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
